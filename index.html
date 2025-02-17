@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>README Viewer</title>
+</head>
+<body>
+    <div id="readme-content" class="markdown-body">
+        <!-- README content will be inserted here -->
+    </div>
+    <div id="error-message"></div>  <!-- Placeholder for error messages -->
+
+    <script>
+        async function fetchAndDisplayReadme() {
+            try {
+                const response = await fetch('README.md'); // Fetch the README.md file
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch README.md: ${response.status} ${response.statusText}`);
+                }
+
+                const markdownText = await response.text(); // Get the content as text
+
+                // Use a library like marked to convert Markdown to HTML
+                // You can either include marked.js via a CDN or install it with npm/yarn
+                // Here we use a CDN:
+
+                const readmeContentDiv = document.getElementById('readme-content');
+                const errorMessageDiv = document.getElementById('error-message');
+
+               if (typeof marked === 'undefined') {
+                   //Load marked library dynamically
+                   const script = document.createElement('script');
+                   script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+                   script.onload = () => {
+                       //Once library has been loaded
+                       readmeContentDiv.innerHTML = marked.parse(markdownText);
+                   }
+                   document.head.appendChild(script);
+                   return;
+               }
+
+                readmeContentDiv.innerHTML = marked.parse(markdownText);
+                errorMessageDiv.textContent = ''; // Clear any previous error messages
+            } catch (error) {
+                const errorMessageDiv = document.getElementById('error-message');
+                errorMessageDiv.textContent = `Error: ${error.message}`;
+                console.error(error); // Log the error to the console
+            }
+        }
+    fetchAndDisplayReadme();
+
+    </script>
+</body>
+</html>
